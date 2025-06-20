@@ -14,11 +14,11 @@ describe("ProductTracker", function () {
   let consumer;
 
   beforeEach(async function () {
-    // Get signers
+    
     [owner, manufacturer1, manufacturer2, certifier1, certifier2, retailer, consumer] = 
       await ethers.getSigners();
 
-    // Deploy contract
+  
     ProductTracker = await ethers.getContractFactory("ProductTracker");
     productTracker = await ProductTracker.deploy();
     await productTracker.waitForDeployment();

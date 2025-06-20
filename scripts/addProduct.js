@@ -6,10 +6,9 @@ async function main() {
   // Get signers
   const [owner, manufacturer, certifier, retailer] = await ethers.getSigners();
   
-  // Replace with your deployed contract address
+
   const CONTRACT_ADDRESS = "YOUR_DEPLOYED_CONTRACT_ADDRESS_HERE";
   
-  // Get contract instance
   const ProductTracker = await ethers.getContractFactory("ProductTracker");
   const productTracker = ProductTracker.attach(CONTRACT_ADDRESS);
 
@@ -17,7 +16,7 @@ async function main() {
   console.log("Contract owner:", await productTracker.owner());
 
   try {
-    // Add authorized manufacturer and certifier
+
     console.log("\n=== Setting up authorized users ===");
     await productTracker.connect(owner).addAuthorizedManufacturer(manufacturer.address);
     console.log("Added authorized manufacturer:", manufacturer.address);
@@ -25,7 +24,7 @@ async function main() {
     await productTracker.connect(owner).addAuthorizedCertifier(certifier.address);
     console.log("Added authorized certifier:", certifier.address);
 
-    // Add a new product
+
     console.log("\n=== Adding new product ===");
     const tx1 = await productTracker.connect(manufacturer).addProduct(
       "Organic Coffee Beans",
@@ -34,7 +33,7 @@ async function main() {
     );
     const receipt1 = await tx1.wait();
     
-    // Get product ID from event
+  
     const productAddedEvent = receipt1.logs.find(log => {
       try {
         const parsedLog = productTracker.interface.parseLog(log);
@@ -49,7 +48,7 @@ async function main() {
     
     console.log("Product added with ID:", productId.toString());
 
-    // Update product stage
+    
     console.log("\n=== Updating product stage ===");
     await productTracker.connect(manufacturer).updateProductStage(
       productId,
@@ -75,7 +74,7 @@ async function main() {
     );
     console.log("Updated product stage to: Shipping");
 
-    // Add certification
+  
     console.log("\n=== Adding certification ===");
     const oneYearFromNow = Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60);
     await productTracker.connect(certifier).addCertification(
@@ -86,12 +85,12 @@ async function main() {
     );
     console.log("Added organic certification");
 
-    // Transfer ownership
+ 
     console.log("\n=== Transferring ownership ===");
     await productTracker.connect(manufacturer).transferOwnership(productId, retailer.address);
     console.log("Transferred ownership to retailer:", retailer.address);
 
-    // Final update by new owner
+  
     await productTracker.connect(retailer).updateProductStage(
       productId,
       "Retail",
@@ -142,7 +141,7 @@ async function main() {
   } catch (error) {
     console.error("Error during product operations:", error);
     
-    // Try to get more details about the error
+   
     if (error.reason) {
       console.error("Error reason:", error.reason);
     }

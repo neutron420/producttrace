@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 async function main() {
   console.log("Starting deployment...");
 
-  // Get the ContractFactory and Signers
+  
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
@@ -11,7 +11,7 @@ async function main() {
   const balance = await ethers.provider.getBalance(deployer.address);
   console.log("Account balance:", ethers.formatEther(balance), "ETH");
 
-  // Deploy the ProductTracker contract
+
   console.log("Deploying ProductTracker contract...");
   const ProductTracker = await ethers.getContractFactory("ProductTracker");
   const productTracker = await ProductTracker.deploy();
