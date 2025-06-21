@@ -73,7 +73,10 @@ The project supports multiple networks:
 - **Hardhat Network**: Local development  
 - **Localhost**: Local Hardhat node  
 - **Sepolia**: Ethereum testnet  
-- **Mainnet**: Ethereum mainnet  
+- **Mainnet**: Ethereum mainnet
+
+# Testnet Deployment Notes
+Sepolia ETH used from Chainstack Faucet and ETH Drips 25
 
 ## 🧪 Testing
 
