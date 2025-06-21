@@ -273,7 +273,7 @@ MIT License - See `LICENSE` file.
 
 ---
 
-## 🆘 Support
+##  Support
 
 - Open an issue on GitHub  
 - Refer to test examples  
@@ -281,7 +281,7 @@ MIT License - See `LICENSE` file.
 
 ---
 
-## 🔮 Future Enhancements
+##  Future Enhancements
 
 - IoT integration  
 - Mobile scanner app  
