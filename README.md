@@ -292,4 +292,4 @@ MIT License - See `LICENSE` file.
 
 ---
 
-**Note**: This is a production-ready system. Always test thoroughly before deploying to Ethereum Mainnet.
+**Note**: This is a production-ready system. Always test it on Testnet thoroughly before deploying to Ethereum Mainnet.
