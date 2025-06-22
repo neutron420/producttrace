@@ -133,7 +133,7 @@ npm run deploy:mainnet
 
 ## ✅ Verified Deployment
 
-- **Network**: Sepolia Testnet  
+- **Network**: Ethereum Sepolia Testnet  
 - **Contract Address**: [`0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69`](https://sepolia.etherscan.io/address/0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69#code)  
 - **Status**: ✅ Verified on Etherscan
 
