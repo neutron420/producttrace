@@ -3,6 +3,8 @@ import { ArrowRight, Play, CheckCircle, Globe, Users, Zap, Shield } from "lucide
 import WorldMapDemo from "../components/WorldMapdemo"; // Add this import
 import FeatureSection from "../components/FeatureSection"; // Add this import
 import FloatingLogos from "../components/FloatingLogos"; // Add this import
+import { ContainerScroll } from "../components/Scroll"; // Add this import
+import TraceLogicDashboard from "../components/TraceLogicDashboard"; // Add this import
 
 // Animated Counter Component
 const AnimatedCounter: React.FC<{ 
@@ -297,8 +299,8 @@ const TraceLogicHomepage: React.FC = () => {
       {/* Feature Section - Added below WorldMapDemo */}
       <FeatureSection />
 
-      {/* Floating Logos Section - Added below FeatureSection */}
-      <section className="py-16 bg-gray-50">
+      {/* Floating Logos Section - Modified to reduce bottom padding */}
+      <section className="pt-16 pb-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -313,6 +315,21 @@ const TraceLogicHomepage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Scroll Animation Section with TraceLogic Dashboard */}
+      <div className="mt-0">
+        <ContainerScroll
+          titleComponent={
+            <h2 className="text-4xl font-bold text-gray-900 mb-8">
+              Experience Our Platform in Action
+            </h2>
+          }
+        >
+          <div className="w-full h-full rounded-lg overflow-hidden shadow-2xl">
+            <TraceLogicDashboard />
+          </div>
+        </ContainerScroll>
+      </div>
     </div>
   );
 };
