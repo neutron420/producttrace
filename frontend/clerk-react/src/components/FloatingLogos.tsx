@@ -152,15 +152,15 @@ const FloatingLogos: React.FC<FloatingLogosProps> = ({
             }
             
             .logo-name {
-              font-size: 11px;
-              font-weight: 600;
+              font-size: 9px;
+              font-weight: 500;
               color: #1e293b;
               text-align: center;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
               max-width: 100%;
-              letter-spacing: 0.02em;
+              letter-spacing: 0.01em;
             }
             
             .logo-fallback {
@@ -169,7 +169,7 @@ const FloatingLogos: React.FC<FloatingLogosProps> = ({
               left: 50%;
               transform: translate(-50%, -50%);
               font-weight: 700;
-              font-size: 14px;
+              font-size: 12px;
               color: #475569;
               opacity: 0;
               transition: opacity 0.3s ease;

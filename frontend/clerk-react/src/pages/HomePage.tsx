@@ -5,6 +5,7 @@ import FeatureSection from "../components/FeatureSection"; // Add this import
 import FloatingLogos from "../components/FloatingLogos"; // Add this import
 import { ContainerScroll } from "../components/Scroll"; // Add this import
 import TraceLogicDashboard from "../components/TraceLogicDashboard"; // Add this import
+import Footer from "../components/ui/Footer"; // Add Footer import
 
 // Animated Counter Component
 const AnimatedCounter: React.FC<{ 
@@ -320,7 +321,7 @@ const TraceLogicHomepage: React.FC = () => {
       <div className="mt-0">
         <ContainerScroll
           titleComponent={
-            <h2 className="text-4xl font-bold text-gray-900 mb-8">
+            <h2 className="text-4xl font-bold text-white mb-8">
               Experience Our Platform in Action
             </h2>
           }
@@ -330,6 +331,9 @@ const TraceLogicHomepage: React.FC = () => {
           </div>
         </ContainerScroll>
       </div>
+
+      {/* Footer Section - Added below scroll animation */}
+      <Footer />
     </div>
   );
 };
