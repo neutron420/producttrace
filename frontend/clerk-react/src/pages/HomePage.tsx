@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowRight, Play, CheckCircle, Globe, Users, Zap, Shield } from "lucide-react";
 import WorldMapDemo from "../components/WorldMapdemo"; // Add this import
 import FeatureSection from "../components/FeatureSection"; // Add this import
+import FloatingLogos from "../components/FloatingLogos"; // Add this import
 
 // Animated Counter Component
 const AnimatedCounter: React.FC<{ 
@@ -295,6 +296,23 @@ const TraceLogicHomepage: React.FC = () => {
 
       {/* Feature Section - Added below WorldMapDemo */}
       <FeatureSection />
+
+      {/* Floating Logos Section - Added below FeatureSection */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Trusted by Leading Technologies
+            </h2>
+            <p className="text-xl text-gray-600">
+              Built on industry-leading blockchain and web3 infrastructure
+            </p>
+          </div>
+          <div className="relative overflow-hidden">
+            <FloatingLogos speed="normal" />
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
