@@ -29,7 +29,7 @@ export default function NavBar() {
             items: [
                 { title: "About us", href: "/about" },
                 { title: "Careers", href: "/careers" },
-                { title: "Press", href: "/press" },
+                { title: "Team", href: "/team" },
                 { title: "Contact", href: "/contact" },
             ],
         },
