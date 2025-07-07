@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
-export default function NavBar() { 
+export default function NavBar() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    // Updated order of navigation items
     const navigationItems = [
         {
             title: "Home",
@@ -14,13 +16,18 @@ export default function NavBar() {
             description: "",
         },
         {
+            title: "Connect Wallet",
+            href: "/resources",
+            description: "",
+        },
+        {
             title: "Product",
             description: "Explore our powerful features and tools",
             items: [
-                { title: "Reports", href: "/reports" },
-                { title: "Analytics", href: "/analytics" },
-                { title: "Dashboards", href: "/dashboards" },
-                { title: "Integrations", href: "/integrations" },
+                { title: "Add Product", href: "/add-product" },
+                { title: "Product Page", href: "/products" },
+                { title: "Main Page", href: "/Main" },
+                { title: "Track Product", href: "/track-product" }, // Added new item
             ],
         },
         {
@@ -32,11 +39,6 @@ export default function NavBar() {
                 { title: "Team", href: "/team" },
                 { title: "Contact", href: "/contact" },
             ],
-        },
-        {
-            title: "Resources",
-            href: "/resources",
-            description: "",
         },
     ];
 
@@ -116,7 +118,7 @@ export default function NavBar() {
                                                 {item.title}
                                                 <ChevronDown className={`ml-1 w-4 h-4 transition-transform duration-200 ${activeDropdown === index ? 'rotate-180' : ''}`} />
                                             </button>
-                                            
+
                                             {activeDropdown === index && (
                                                 <div className="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 p-6 animate-in fade-in-0 zoom-in-95">
                                                     <div className="grid grid-cols-2 gap-4">
@@ -129,15 +131,15 @@ export default function NavBar() {
                                                         </div>
                                                         <div className="space-y-2">
                                                             {item.items.map((subItem) => (
-                                                                <a
+                                                                <Link
                                                                     key={subItem.title}
-                                                                    href={subItem.href}
+                                                                    to={subItem.href}
                                                                     className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 transition-colors"
                                                                     onClick={() => setActiveDropdown(null)}
                                                                 >
                                                                     <span className="text-sm text-gray-700">{subItem.title}</span>
                                                                     <ArrowRight className="w-4 h-4 text-gray-400" />
-                                                                </a>
+                                                                </Link>
                                                             ))}
                                                         </div>
                                                     </div>
@@ -145,12 +147,12 @@ export default function NavBar() {
                                             )}
                                         </div>
                                     ) : (
-                                        <a
-                                            href={item.href}
+                                        <Link // Changed to Link to ensure routing without full page reload
+                                            to={item.href}
                                             className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors duration-200"
                                         >
                                             {item.title}
-                                        </a>
+                                        </Link>
                                     )}
                                 </div>
                             ))}
@@ -163,7 +165,7 @@ export default function NavBar() {
                             Book a demo
                         </button>
                         <div className="w-px h-6 bg-gray-300"></div>
-                        
+
                         <SignedOut>
                             <SignInButton mode="modal">
                                 <button className="border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-black px-4 py-2 rounded-md text-sm font-medium transition-colors">
@@ -176,9 +178,9 @@ export default function NavBar() {
                                 </button>
                             </SignInButton>
                         </SignedOut>
-                        
+
                         <SignedIn>
-                            <UserButton 
+                            <UserButton
                                 afterSignOutUrl="/"
                                 appearance={{
                                     elements: {
@@ -215,37 +217,37 @@ export default function NavBar() {
                                         </div>
                                         <div className="pl-4 space-y-1">
                                             {item.items.map((subItem) => (
-                                                <a
+                                                <Link
                                                     key={subItem.title}
-                                                    href={subItem.href}
+                                                    to={subItem.href}
                                                     className="flex items-center justify-between text-gray-600 hover:text-black block py-2 text-sm transition-colors"
                                                     onClick={() => setIsOpen(false)}
                                                 >
                                                     <span>{subItem.title}</span>
                                                     <ArrowRight className="w-4 h-4" />
-                                                </a>
+                                                </Link>
                                             ))}
                                         </div>
                                     </div>
                                 ) : (
-                                    <a
-                                        href={item.href}
+                                    <Link // Changed to Link to ensure routing without full page reload
+                                        to={item.href}
                                         className="flex items-center justify-between text-black hover:text-gray-600 block py-2 text-base font-medium transition-colors"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         <span>{item.title}</span>
                                         <ArrowRight className="w-4 h-4" />
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
                         ))}
-                        
+
                         {/* Mobile CTA Buttons */}
                         <div className="pt-4 space-y-2">
                             <button className="w-full text-left text-gray-700 hover:text-black block py-2 text-base font-medium transition-colors">
                                 Book a demo
                             </button>
-                            
+
                             <SignedOut>
                                 <SignInButton mode="modal">
                                     <button className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-black py-2 rounded-md text-sm font-medium transition-colors">
@@ -258,10 +260,10 @@ export default function NavBar() {
                                     </button>
                                 </SignInButton>
                             </SignedOut>
-                            
+
                             <SignedIn>
                                 <div className="flex justify-center pt-2">
-                                    <UserButton 
+                                    <UserButton
                                         afterSignOutUrl="/"
                                         appearance={{
                                             elements: {

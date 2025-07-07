@@ -5,22 +5,29 @@ import Career from './pages/Career';
 import TeamPage from './pages/Team';
 import Footer from './components/ui/Footer';
 import AboutPage from './pages/AboutPage';
+import AddProduct from './pages/AddProduct';
+import TrackProduct from './pages/TrackProduct';
+import MainPage from './pages/Main';
+import ProductsPage from './pages/ProductPage';
 
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <NavBar />
-        <main className="flex-grow">
+        <main className="flex-1">
           <Routes>
             <Route path="/" element={<TraceLogicHomepage />} />
-            <Route path="/careers" element={<Career />} />
-            <Route path="/about" element={<AboutPage />} />
+            <Route path="/career" element={<Career />} />
             <Route path="/team" element={<TeamPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/add-product" element={<AddProduct />} /> {/* updated route */}
+            <Route path="/track-product" element={<TrackProduct />} />
+            <Route path="/Main" element={<MainPage />} />
+            <Route path="/products" element={<ProductsPage />} />
             <Route path="/contact" element={<div>Contact Page</div>} />
             <Route path="/reports" element={<div>Reports Page</div>} />
             <Route path="/analytics" element={<div>Analytics Page</div>} />
-            <Route path="/dashboards" element={<div>Dashboards Page</div>} />
             <Route path="/integrations" element={<div>Integrations Page</div>} />
             <Route path="/resources" element={<div>Resources Page</div>} />
           </Routes>
