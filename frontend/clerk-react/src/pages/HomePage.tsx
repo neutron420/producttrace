@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Play, CheckCircle, Globe, Users, Zap, Shield } from "lucide-react";
+import { ArrowRight, Play, CheckCircle, Globe, Users, Zap, Shield, X, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 import WorldMapDemo from "../components/WorldMapdemo"; // Add this import
 import FeatureSection from "../components/FeatureSection"; // Add this import
 import FloatingLogos from "../components/FloatingLogos"; // Add this import
@@ -127,10 +128,20 @@ const TraceLogicHomepage: React.FC = () => {
                   <Play className="mr-2 h-5 w-5" />
                   Watch Demo
                 </button>
-                <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors duration-200 flex items-center justify-center">
-                  Get Started
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </button>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors duration-200 flex items-center justify-center">
+                      Get Started
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors duration-200 flex items-center justify-center">
+                    Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </button>
+                </SignedIn>
               </div>
             </div>
 
@@ -330,6 +341,9 @@ const TraceLogicHomepage: React.FC = () => {
           </div>
         </ContainerScroll>
       </div>
+
+      {/* Sign-in Modal */}
+      {/* <SignInModal isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} /> */}
     </div>
   );
 };
