@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import TraceLogicHomepage from './pages/HomePage';
-import Career from './pages/Career';
+import CareerPage from './pages/Career'; // Renamed from Career to CareerPage
 import TeamPage from './pages/Team';
 import Footer from './components/ui/Footer';
 import AboutPage from './pages/AboutPage';
@@ -18,10 +18,10 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<TraceLogicHomepage />} />
-            <Route path="/career" element={<Career />} />
+            <Route path="/career" element={<CareerPage />} /> {/* Updated to CareerPage */}
             <Route path="/team" element={<TeamPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/add-product" element={<AddProduct />} /> {/* updated route */}
+            <Route path="/add-product" element={<AddProduct />} />
             <Route path="/track-product" element={<TrackProduct />} />
             <Route path="/Main" element={<MainPage />} />
             <Route path="/products" element={<ProductsPage />} />

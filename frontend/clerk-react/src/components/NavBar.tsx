@@ -4,9 +4,9 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-reac
 import { Link } from 'react-router-dom'; // Import Link for navigation
 
 export default function NavBar() {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const dropdownRef = useRef(null);
 
     // Updated order of navigation items
     const navigationItems = [
@@ -35,7 +35,7 @@ export default function NavBar() {
             description: "Learn more about our mission and team",
             items: [
                 { title: "About us", href: "/about" },
-                { title: "Careers", href: "/careers" },
+                { title: "Careers", href: "/career" }, // Changed href from "/careers" to "/career"
                 { title: "Team", href: "/team" },
                 { title: "Contact", href: "/contact" },
             ],
@@ -44,8 +44,8 @@ export default function NavBar() {
 
     // ✅ Added: Click outside to close dropdown
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setActiveDropdown(null);
             }
         };
@@ -71,7 +71,7 @@ export default function NavBar() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const handleDropdownToggle = (index: number) => {
+    const handleDropdownToggle = (index) => {
         setActiveDropdown(activeDropdown === index ? null : index);
     };
 
