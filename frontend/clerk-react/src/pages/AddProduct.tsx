@@ -33,7 +33,10 @@ const AddProduct = () => {
       setMessage("🌐 Checking network...");
       await checkNetwork();
       setMessage("⏳ Adding product to blockchain...");
+      
+      // Fixed: Pass parameters in correct order matching contract function signature
       const result = await addProduct(productId, name, origin, status);
+      
       setMessage("✅ Product added successfully! Transaction hash: " + result.transactionHash);
       setProductId("");
       setName("");
