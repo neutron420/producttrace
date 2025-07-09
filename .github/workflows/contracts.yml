@@ -1,0 +1,40 @@
+name: Contracts CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install contracts dependencies
+        run: |
+          cd contracts
+          npm ci
+
+      - name: Compile contracts
+        run: |
+          cd contracts
+          npx hardhat compile
+
+      - name: Lint contracts (Solhint)
+        run: |
+          cd contracts
+          npx solhint 'contracts/**/*.sol'
+
+      - name: Run contract tests
+        run: |
+          cd contracts
+          npx hardhat test
