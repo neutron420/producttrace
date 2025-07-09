@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserProvider } from 'ethers';
+import { useNavigate } from 'react-router-dom';
 
 // Supported wallets configuration
 const SUPPORTED_WALLETS = [
@@ -37,19 +38,80 @@ const SUPPORTED_WALLETS = [
   }
 ];
 
+const LOCAL_STORAGE_KEY = 'connected_wallet_account';
+
 const WalletConnect = ({ className = '' }) => {
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState('0');
-  const [chainId, setChainId] = useState(null);
+  const [chainId, setChainId] = useState<number | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [provider, setProvider] = useState(null);
+  const [provider, setProvider] = useState<any>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
   const [connectingWallet, setConnectingWallet] = useState('');
 
-  // --- REMOVED useEffect and checkConnection() ---
+  const navigate = useNavigate();
+
+  // On mount, check localStorage for persisted connection
+  useEffect(() => {
+    const storedAccount = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedAccount) {
+      // Try to restore provider and account info
+      restoreConnection(storedAccount);
+    }
+    // Listen for account/network changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+    }
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      }
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  const restoreConnection = async (storedAccount: string) => {
+    try {
+      if (typeof window.ethereum !== 'undefined') {
+        const provider = new BrowserProvider(window.ethereum);
+        const network = await provider.getNetwork();
+        const balance = await provider.getBalance(storedAccount);
+        setAccount(storedAccount);
+        setBalance(balance.toString());
+        setChainId(Number(network.chainId));
+        setIsConnected(true);
+        setProvider(provider);
+      }
+    } catch (err) {
+      // If restoration fails, clear storage and state
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      setAccount('');
+      setBalance('0');
+      setChainId(null);
+      setIsConnected(false);
+      setProvider(null);
+    }
+  };
+
+  const handleAccountsChanged = (accounts: string[]) => {
+    if (accounts.length === 0) {
+      handleDisconnect();
+    } else {
+      // Update account and balance
+      restoreConnection(accounts[0]);
+      localStorage.setItem(LOCAL_STORAGE_KEY, accounts[0]);
+    }
+  };
+
+  const handleChainChanged = () => {
+    // Reload the page to update network info
+    window.location.reload();
+  };
 
   const getConnectedWalletType = () => {
     if (typeof window.ethereum !== 'undefined') {
@@ -61,18 +123,16 @@ const WalletConnect = ({ className = '' }) => {
     return 'unknown';
   };
 
-  const connectWallet = async (walletId) => {
+  const connectWallet = async (walletId: string) => {
     setConnectingWallet(walletId);
     setError('');
     setIsConnecting(true);
 
     try {
-      // Check if ethereum is available
       if (typeof window.ethereum === 'undefined') {
         throw new Error('No wallet extension detected. Please install a wallet.');
       }
 
-      // For different wallets, we might need different approaches
       switch (walletId) {
         case 'metamask':
           if (!window.ethereum.isMetaMask) {
@@ -98,13 +158,9 @@ const WalletConnect = ({ className = '' }) => {
           throw new Error('Unsupported wallet');
       }
 
-      // Request account access
       await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      // Create provider
       const provider = new BrowserProvider(window.ethereum);
-
-      // Get accounts
       const accounts = await provider.listAccounts();
 
       if (accounts.length === 0) {
@@ -112,27 +168,23 @@ const WalletConnect = ({ className = '' }) => {
       }
 
       const userAddress = accounts[0].address;
-
-      // Get balance and network info
       const balance = await provider.getBalance(userAddress);
       const network = await provider.getNetwork();
 
-      // Update state
       setAccount(userAddress);
       setBalance(balance.toString());
       setChainId(Number(network.chainId));
       setIsConnected(true);
       setProvider(provider);
-
-      // Close modal
       setIsModalOpen(false);
+
+      // Persist the connected account
+      localStorage.setItem(LOCAL_STORAGE_KEY, userAddress);
 
       console.log(`Connected to ${walletId} wallet:`, userAddress);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Connection error:', error);
-
-      // Handle specific error codes
       if (error.code === 4001) {
         setError('Connection rejected by user');
       } else if (error.code === -32002) {
@@ -153,13 +205,14 @@ const WalletConnect = ({ className = '' }) => {
     setIsConnected(false);
     setProvider(null);
     setError('');
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
   };
 
-  const formatAddress = (addr) => {
+  const formatAddress = (addr: string) => {
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
   };
 
-  const getWalletInfo = (walletId) => {
+  const getWalletInfo = (walletId: string) => {
     return SUPPORTED_WALLETS.find(wallet => wallet.id === walletId);
   };
 
@@ -174,30 +227,29 @@ const WalletConnect = ({ className = '' }) => {
     }
   };
 
-  const getNetworkName = (chainId) => {
-    const networks = {
+  const getNetworkName = (chainId: number | null) => {
+    const networks: { [key: number]: string } = {
       1: 'Ethereum',
       137: 'Polygon',
       56: 'BSC',
       11155111: 'Sepolia',
       5: 'Goerli'
     };
-    return networks[chainId] || `Chain ${chainId}`;
+    return chainId ? networks[chainId] || `Chain ${chainId}` : '';
   };
 
-  const formatBalance = (balance) => {
+  const formatBalance = (balance: string) => {
     try {
       const balanceInEth = parseFloat(balance) / Math.pow(10, 18);
       return balanceInEth.toFixed(4);
-    } catch (error) {
+    } catch {
       return '0.0000';
     }
   };
 
+  // Navigate to Add Product page
   const handleAddProduct = () => {
-    // This function will be implemented later
-    console.log('Add Product clicked');
-    alert('Add Product functionality will be implemented soon!');
+    navigate('/add-product');
   };
 
   // Connected state UI
@@ -218,9 +270,9 @@ const WalletConnect = ({ className = '' }) => {
                 )}
               </div>
             </div>
-            <div 
+            <div
               className="font-mono text-sm cursor-pointer opacity-90 hover:opacity-100 transition-opacity"
-              onClick={copyAddress} 
+              onClick={copyAddress}
               title="Click to copy"
             >
               {formatAddress(account)}
@@ -229,7 +281,7 @@ const WalletConnect = ({ className = '' }) => {
               Balance: {formatBalance(balance)} ETH
             </div>
           </div>
-          <button 
+          <button
             onClick={handleDisconnect}
             className="bg-white/20 border border-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/30 transition-all"
           >
@@ -264,12 +316,12 @@ const WalletConnect = ({ className = '' }) => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" 
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
-            className="bg-white rounded-2xl w-[90%] max-w-md max-h-[90vh] overflow-y-auto shadow-2xl" 
+          <div
+            className="bg-white rounded-2xl w-[90%] max-w-md max-h-[90vh] overflow-y-auto shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -318,7 +370,7 @@ const WalletConnect = ({ className = '' }) => {
               ))}
             </div>
 
-            {/* --- SECURITY NOTICE ADDED HERE --- */}
+            {/* --- SECURITY NOTICE --- */}
             <div className="p-5 border-t border-gray-200 text-center bg-yellow-50 rounded-b-2xl">
               <p className="text-sm text-gray-800">
                 <strong>Wallet Security Notice:</strong><br />
@@ -328,18 +380,16 @@ const WalletConnect = ({ className = '' }) => {
                   (To force a password prompt, <b>lock your wallet</b> from the extension before connecting.)
                 </span>
                 <br />
-                <a 
-                  href="https://ethereum.org/en/wallets/" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href="https://ethereum.org/en/wallets/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-blue-500 hover:underline"
                 >
                   Learn more about wallet security
                 </a>
               </p>
             </div>
-            {/* --- END SECURITY NOTICE --- */}
-
           </div>
         </div>
       )}
