@@ -4,5 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react() , tailwindcss()],
+  base: './', // ✅ Added for proper relative asset loading in deployment
+  plugins: [react(), tailwindcss()],
 })
