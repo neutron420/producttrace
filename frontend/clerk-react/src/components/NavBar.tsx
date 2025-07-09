@@ -17,7 +17,7 @@ export default function NavBar() {
         },
         {
             title: "Connect Wallet",
-            href: "/resources",
+            href: "/connect-wallet",
             description: "",
         },
         {
