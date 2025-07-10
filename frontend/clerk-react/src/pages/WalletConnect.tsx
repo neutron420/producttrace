@@ -135,20 +135,63 @@ const WalletConnect = ({ className = '' }) => {
     window.location.reload();
   };
 
-  const simulateAuthenticationFlow = async (walletId) => {
+  // Get specific wallet provider
+  const getWalletProvider = (walletId) => {
+    if (!window.ethereum) return null;
+
+    // If there are multiple providers, find the specific one
+    if (window.ethereum.providers && window.ethereum.providers.length > 1) {
+      switch (walletId) {
+        case 'metamask':
+          return window.ethereum.providers.find(p => p.isMetaMask) || window.ethereum;
+        case 'trust':
+          return window.ethereum.providers.find(p => p.isTrust) || window.ethereum;
+        case 'safepal':
+          return window.ethereum.providers.find(p => p.isSafePal) || window.ethereum;
+        case 'rabby':
+          return window.ethereum.providers.find(p => p.isRabby) || window.ethereum;
+        default:
+          return window.ethereum;
+      }
+    }
+
+    return window.ethereum;
+  };
+
+  // Force wallet unlock and authentication
+  const forceWalletAuthentication = async (walletProvider, walletId) => {
     setShowAuthPrompt(true);
-    setConnectionStep('Requesting wallet unlock...');
+    setConnectionStep('Checking wallet status...');
     
-    // Simulate authentication delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setConnectionStep('Authenticating...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setConnectionStep('Verifying credentials...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setShowAuthPrompt(false);
+    try {
+      // First, check if wallet is already connected
+      const existingAccounts = await walletProvider.request({ method: 'eth_accounts' });
+      
+      if (existingAccounts.length === 0) {
+        // Wallet is locked or no permissions - this will trigger popup
+        setConnectionStep('Wallet locked - requesting unlock...');
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        setConnectionStep('Please unlock your wallet when prompted');
+        const accounts = await walletProvider.request({ method: 'eth_requestAccounts' });
+        
+        setConnectionStep('Wallet unlocked successfully!');
+        return accounts;
+      } else {
+        // Wallet is unlocked but let's still request fresh permissions
+        setConnectionStep('Requesting fresh permissions...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // This might still show popup depending on wallet settings
+        const accounts = await walletProvider.request({ method: 'eth_requestAccounts' });
+        
+        setConnectionStep('Permissions granted!');
+        return accounts;
+      }
+    } catch (error) {
+      setConnectionStep('Authentication failed');
+      throw error;
+    }
   };
 
   const handleConnectWallet = () => {
@@ -172,52 +215,54 @@ const WalletConnect = ({ className = '' }) => {
 
       const walletInfo = SUPPORTED_WALLETS.find(w => w.id === walletId);
       
-      // Check wallet availability
+      // Get specific wallet provider
+      const walletProvider = getWalletProvider(walletId);
+      
+      if (!walletProvider) {
+        throw new Error(`${walletInfo.extensionName} not found. Please install ${walletInfo.extensionName}.`);
+      }
+
+      // Check wallet-specific availability
       switch (walletId) {
         case 'metamask':
-          if (!window.ethereum.isMetaMask) {
+          if (!walletProvider.isMetaMask && !window.ethereum.isMetaMask) {
             throw new Error('MetaMask not detected. Please install MetaMask.');
           }
           break;
         case 'trust':
-          if (!window.ethereum.isTrust) {
+          if (!walletProvider.isTrust && !window.ethereum.isTrust) {
             console.warn('Trust Wallet not specifically detected, attempting connection...');
           }
           break;
         case 'safepal':
-          if (!window.ethereum.isSafePal) {
+          if (!walletProvider.isSafePal && !window.ethereum.isSafePal) {
             console.warn('SafePal not specifically detected, attempting connection...');
           }
           break;
         case 'rabby':
-          if (!window.ethereum.isRabby) {
+          if (!walletProvider.isRabby && !window.ethereum.isRabby) {
             console.warn('Rabby not specifically detected, attempting connection...');
           }
           break;
-        default:
-          throw new Error('Unsupported wallet');
       }
 
       setConnectionStep('Wallet detected!');
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Show authentication flow
-      await simulateAuthenticationFlow(walletId);
-
-      setConnectionStep('Requesting account access...');
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new BrowserProvider(window.ethereum);
-      const accounts = await provider.listAccounts();
+      // Force wallet authentication - this will trigger popup
+      const accounts = await forceWalletAuthentication(walletProvider, walletId);
 
       if (accounts.length === 0) {
-        throw new Error('No accounts found. Please unlock your wallet.');
+        throw new Error('No accounts found. Please unlock your wallet and try again.');
       }
 
       setConnectionStep('Fetching account details...');
-      const userAddress = accounts[0].address;
-      const balance = await provider.getBalance(userAddress);
-      const network = await provider.getNetwork();
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const browserProvider = new BrowserProvider(walletProvider);
+      const userAddress = accounts[0];
+      const balance = await browserProvider.getBalance(userAddress);
+      const network = await browserProvider.getNetwork();
 
       setConnectionStep('Connected successfully!');
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -226,7 +271,7 @@ const WalletConnect = ({ className = '' }) => {
       setBalance(balance.toString());
       setChainId(Number(network.chainId));
       setIsConnected(true);
-      setProvider(provider);
+      setProvider(browserProvider);
       setConnectedWalletType(walletId);
       setIsModalOpen(false);
 
@@ -239,11 +284,13 @@ const WalletConnect = ({ className = '' }) => {
     } catch (error) {
       console.error('Connection error:', error);
       if (error.code === 4001) {
-        setError('Connection rejected by user');
+        setError('Connection rejected by user. Please try again and approve the connection.');
       } else if (error.code === -32002) {
-        setError('Connection request is already pending');
+        setError('Connection request is already pending. Please check your wallet.');
+      } else if (error.code === -32603) {
+        setError('Wallet error occurred. Please unlock your wallet and try again.');
       } else {
-        setError(error.message || 'Failed to connect wallet');
+        setError(error.message || 'Failed to connect wallet. Please make sure your wallet is unlocked.');
       }
     } finally {
       setConnectingWallet('');
@@ -483,13 +530,13 @@ const WalletConnect = ({ className = '' }) => {
                     🔐
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Unlock Your Wallet</h3>
-                    <p className="text-sm text-gray-600">Please enter your wallet password if prompted</p>
+                    <h3 className="font-semibold text-gray-900">Wallet Authentication</h3>
+                    <p className="text-sm text-gray-600">Please check your wallet extension for unlock prompt</p>
                   </div>
                 </div>
-                <div className="bg-gray-100 rounded-lg p-3">
-                  <p className="text-xs text-gray-800">
-                    <strong>Security Note:</strong> Your wallet extension may request your password. This is normal and secure.
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-xs text-yellow-800">
+                    <strong>⚠️ Important:</strong> If your wallet is locked, you'll see a password prompt. This is normal and secure.
                   </p>
                 </div>
               </div>
@@ -541,23 +588,30 @@ const WalletConnect = ({ className = '' }) => {
               ))}
             </div>
 
-            {/* Security Notice */}
-            <div className="p-6 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            {/* Enhanced Security Notice */}
+            <div className="p-6 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-gray-50">
               <div className="flex items-start gap-3">
                 <span className="text-2xl">🔒</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Security Notice</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Enhanced Security</h3>
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    Your wallet will request authentication if it's locked. This process is secure and protects your funds.
+                    This connection will attempt to trigger your wallet's authentication flow. If your wallet is locked, 
+                    you'll see a password prompt - this is normal and secure.
                     <br />
                     <br />
-                    <strong>Tip:</strong> To ensure password prompts appear, lock your wallet before connecting.
+                    <strong>Tips for better authentication:</strong>
+                    <br />
+                    • Lock your wallet before connecting for a proper unlock prompt
+                    <br />
+                    • Make sure your wallet extension is active
+                    <br />
+                    • Check for popup blockers if prompts don't appear
                   </p>
                   <a
                     href="https://ethereum.org/en/wallets/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-900 hover:text-gray-700 text-sm font-medium mt-2 inline-block"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-block"
                   >
                     Learn more about wallet security →
                   </a>
