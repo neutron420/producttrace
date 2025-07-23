@@ -1,295 +1,129 @@
-
-# Product Traceability Blockchain System
-
-A comprehensive blockchain-based product traceability system built with Solidity and Hardhat. This system enables transparent tracking of products throughout their entire lifecycle, from manufacturing to retail, with immutable records stored on the Ethereum blockchain.
-
-## 🌟 Features
-
-- **Immutable Product Records**: All product information is stored permanently on the blockchain  
-- **Complete Traceability**: Track products through every stage of their lifecycle  
-- **Authorization System**: Role-based access control for manufacturers, certifiers, and other stakeholders  
-- **Certification Management**: Add and manage product certifications with expiration dates  
-- **Ownership Transfer**: Seamless transfer of product ownership between parties  
-- **Event Logging**: Comprehensive event system for monitoring all contract interactions  
-- **Gas Optimized**: Efficient smart contract design to minimize transaction costs  
-
-## 🏗️ System Architecture
-
-### Smart Contract Components
-
-- `ProductTracker.sol`: Main contract handling all product operations  
-- Authorization System: Manages authorized manufacturers and certifiers  
-- Product Management: Handles product creation, updates, and lifecycle tracking  
-- Certification System: Manages product certifications and validations  
-- Ownership Transfer: Facilitates secure ownership transfers between parties  
-
-### Data Structures
-
-- **Product**: Core product information including ID, name, description, manufacturer, and current status  
-- **TraceabilityRecord**: Individual records tracking product movement and updates  
-- **Certification**: Product certifications with validity periods and certifying authorities  
-
-## 📋 Prerequisites
-
-- Node.js (v16 or higher)  
-- npm or yarn  
-- Git  
-
-## 🚀 Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd producttrace
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-PRIVATE_KEY=your_private_key_here
-SEPOLIA_URL=https://sepolia.infura.io/v3/your_infura_project_id
-MAINNET_URL=https://mainnet.infura.io/v3/your_infura_project_id
-ETHERSCAN_API_KEY=your_etherscan_api_key
-REPORT_GAS=true
-
-PRODUCT_TRACKER_ADDRESS_LOCALHOST=
-PRODUCT_TRACKER_ADDRESS_SEPOLIA=0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69
-```
-
-### Network Configuration
-
-The project supports multiple networks:
-- **Hardhat Network**: Local development  
-- **Localhost**: Local Hardhat node  
-- **Sepolia**: Ethereum testnet  
-- **Mainnet**: Ethereum mainnet
-
-# Testnet Deployment Notes
-Sepolia ETH used from Chainstack Faucet and ETH Drips 25
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests with gas reporting
-npm run gas-report
-
-# Run tests with coverage
-npm run coverage
-```
-
-### Test Coverage
-
-Covers:
-- Deployment & Initialization  
-- Authorization  
-- Product Lifecycle  
-- Certification Handling  
-- Ownership Transfer  
-- Edge Cases & Failures  
-
-## 📦 Deployment
-
-### Local Development
-
-```bash
-# Start local Hardhat node
-npm run node
-
-# Deploy to local network
-npm run deploy:local
-```
-
-### Sepolia Testnet Deployment
-
-```bash
-# Deploy to Sepolia
-npm run deploy:sepolia
-
-# Verify on Etherscan
-npm run verify:sepolia 0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69
-```
-
-### Mainnet Deployment
-
-```bash
-npm run deploy:mainnet
-```
-
----
-
-## ✅ Verified Deployment
-
-- **Network**: Ethereum Sepolia Testnet  
-- **Contract Address**: [`0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69`](https://sepolia.etherscan.io/address/0xcf24c7803eF5EEC1B224eDAAa840be3aaE5b1b69#code)  
-- **Status**: ✅ Verified on Etherscan
-
-📸 **Deployment Screenshot**:  
-> ![Deployment Confirmation](![Screenshot (70)](https://github.com/user-attachments/assets/4574e9c5-cfdc-47ba-b92e-57c4dfe7e479)
-)
-> (![Screenshot (71)](https://github.com/user-attachments/assets/3f547870-3c8c-457e-b370-fbd2e6c829d3)
-)
-
----
-
-## 🎯 Usage Examples
-
-### Add a Product
-
-```js
-await productTracker.connect(manufacturer).addProduct(
-  "Organic Coffee Beans",
-  "Premium organic coffee from Colombia",
-  "Coffee Farm, Colombia"
-);
-```
-
-### Update Product Stage
-
-```js
-await productTracker.connect(manufacturer).updateProductStage(
-  productId,
-  "Quality Testing",
-  "Testing Facility, Colombia",
-  "Product passed all quality tests"
-);
-```
-
-### Add Certification
-
-```js
-const expirationDate = Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60);
-await productTracker.connect(certifier).addCertification(
-  productId,
-  "Organic Certification",
-  "Colombian Organic Certification Board",
-  expirationDate
-);
-```
-
-### Transfer Ownership
-
-```js
-await productTracker.connect(currentOwner).transferOwnership(productId, newOwnerAddress);
-```
-
-### Query Product Info
-
-```js
-const product = await productTracker.getProduct(productId);
-const history = await productTracker.getProductHistory(productId);
-const certifications = await productTracker.getProductCertifications(productId);
-```
-
----
-
-## 🔐 Security Features
-
-- **Role-Based Access**  
-- **Event Logging**  
-- **Input Validation**  
-- **Gas Efficiency**  
-
----
-
-## 📈 Contract Functions
-
-### Public Functions
-
-- `addProduct()`  
-- `updateProductStage()`  
-- `transferOwnership()`  
-- `addCertification()`  
-- `getProduct()`  
-- `getProductHistory()`  
-- `getProductCertifications()`  
-
-### Admin Functions
-
-- `addAuthorizedManufacturer()` / `removeAuthorizedManufacturer()`  
-- `addAuthorizedCertifier()` / `removeAuthorizedCertifier()`  
-
----
-
-## 🌐 Frontend Integration
-
-### Web3 Example
-
-```js
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const contract = new ethers.Contract(contractAddress, abi, provider);
-const product = await contract.getProduct(productId);
-```
-
-### QR Code Use
-
-QR code can contain:
-- Product ID  
-- Contract address  
-- Network  
-- Link to view product  
-
----
-
-## 🛠️ Dev Scripts
-
-```bash
-npm run compile
-npm run test
-npm run deploy:local
-npm run add-product
-npm run clean
-npm run console
-```
-
----
+<div align="center">
+
+# ProductTrace 📦
+
+<br/>
+
+<div>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19">
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+  <img src="https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white" alt="Solidity">
+  <img src="https://img.shields.io/badge/Hardhat-D6E52F?style=for-the-badge&logo=hardhat&logoColor=black" alt="Hardhat">
+  <img src="https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white" alt="Ethereum">
+  <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma ORM">
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Clerk-Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk">
+</div>
+
+<br/>
+
+**A full-stack, type-safe SaaS application for tracking and managing product inventory, sales, and details, complete with subscription-based billing and blockchain integration.**
+
+<p>
+  <a href="#-about-the-project">About</a> •
+  <a href="#-key-features">Features</a> •
+  <a href="#-getting-started">Getting Started</a> •
+  <a href="#-contributing">Contributing</a> •
+  <a href="#-license">License</a>
+</p>
+
+[**Live Demo (link to your deployed project)**] · [**Report a Bug**] · [**Request a Feature**]
+
+</div>
+
+## 🌟 About The Project
+
+ProductTrace is a robust SaaS platform designed to provide a seamless experience for managing product lifecycles. From creation and inventory tracking to sales monitoring and subscription management, this application provides all the essential tools for modern e-commerce and inventory-based businesses. It is built with a fully type-safe stack, ensuring reliability and a superior developer experience, with additional capabilities for blockchain interaction.
+
+### 🛠️ Built With
+
+This project leverages a modern, fully type-safe technology stack for a seamless development experience and a high-performance application.
+
+* **Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **Language:** [TypeScript](https://www.typescriptlang.org/) & [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+* **Blockchain:** [Solidity](https://soliditylang.org/), [Hardhat](https://hardhat.org/), [Ethereum](https://ethereum.org/)
+* **Database:** [Neon](https://neon.tech/) (Serverless PostgreSQL)
+* **ORM:** [Prisma](https://www.prisma.io/)
+* **Authentication:** [Clerk](https://clerk.com/) & Wallet Extensions
+* **Payments & Subscriptions:** [Stripe](https://stripe.com/)
+* **File Uploads:** [UploadThing](https://uploadthing.com/)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+* **Schema Validation:** [Zod](https://zod.dev/)
+* **UI Components:** Shadcn/UI, Radix UI, Lucide React
+
+## ✨ Key Features
+
+* **Secure User Authentication:** Managed by Clerk, providing robust sign-up, sign-in, and organization management.
+* **Full Product CRUD:** Complete Create, Read, Update, and Delete functionality for products.
+* **Subscription-Based Billing:** Integrated with Stripe to manage user subscriptions and access to premium features.
+* **Blockchain Integration:** Interact with smart contracts on the Ethereum blockchain.
+* **Image Uploads:** Easy and reliable image uploads for products, powered by UploadThing.
+* **Type-Safe Backend:** End-to-end type safety with Prisma and Zod, eliminating runtime errors.
+* **Responsive Dashboard:** A clean and modern user dashboard for managing products and billing.
+
+## 🚀 Getting Started
+
+To get a local copy up and running for development, follow these simple steps.
+
+### Prerequisites
+
+You will need Node.js (version 18 or higher), a package manager (npm, yarn, or pnpm), and a Neon (or any other PostgreSQL) database. A browser with a wallet extension like MetaMask is required for blockchain features.
+
+### Installation
+
+1.  **Clone the repository:**
+    ```sh
+    git clone [https://github.com/your_username/producttrace.git](https://github.com/your_username/producttrace.git)
+    cd producttrace
+    ```
+
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of your project by copying `.env.example` and fill in your credentials.
+    ```bash
+    cp .env.example .env
+    ```
+    You will need to add keys for:
+    * `DATABASE_URL` (from Neon or your PostgreSQL provider)
+    * `CLERK_SECRET_KEY` & `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+    * `STRIPE_API_KEY` & `STRIPE_WEBHOOK_SECRET`
+    * `UPLOADTHING_SECRET` & `UPLOADTHING_APP_ID`
+    * And other variables as defined in `env.mjs`.
+
+4.  **Generate Prisma Client and Push Schema:**
+    Apply the Prisma schema to your PostgreSQL database.
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
+
+5.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 🤝 Contributing
 
-1. Fork the repository  
-2. Create a new branch  
-3. Commit changes  
-4. Add tests  
-5. Submit a PR  
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
----
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
-## 📄 License
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-MIT License - See `LICENSE` file.
+## 📜 License
 
----
+Distributed under the MIT License. See `LICENSE` for more information.
 
-##  Support
-
-- Open an issue on GitHub  
-- Refer to test examples  
-- Use the Hardhat console  
-
----
-
-##  Future Enhancements
-
-- IoT integration  
-- Mobile scanner app  
-- ERP syncing  
-- Multi-chain support  
-- Analytics dashboards  
-- IPFS storage  
-
----
-
-**Note**: This is a production-ready system. Always test it on Testnet thoroughly before deploying to Ethereum Mainnet.
+Project Link: [https://github.com/neutron420/producttrace](https://github.com/neutron420/producttrace)
